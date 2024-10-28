@@ -10,10 +10,11 @@ import {
   useIsFocused,
 } from "@react-navigation/native";
 
-export default function LocationPicker() {
+export default function LocationPicker({ onPickLocation }) {
   const [pickedLocation, setPickedLocation] = useState(null);
   const [locationPermission, requestPermission] =
     Location.useForegroundPermissions();
+  const [readablelocation, setreadableLocation] = useState(null);
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
@@ -27,6 +28,10 @@ export default function LocationPicker() {
       setPickedLocation(mapPickedLocation);
     }
   }, [route, isFocused]);
+
+  useEffect(() => {
+    onPickLocation({ ...pickedLocation, address: readablelocation });
+  }, [pickedLocation, onPickLocation, readablelocation]);
 
   async function verifyPermission() {
     if (locationPermission.status === Location.PermissionStatus.UNDETERMINED) {
@@ -57,7 +62,21 @@ export default function LocationPicker() {
     });
     console.log(location);
     console.log(pickedLocation);
+    // Reverse Geocode to get human-readable address
+    const addressData = await Location.reverseGeocodeAsync({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+    // Extract address from the first result (if available)
+    if (addressData.length > 0) {
+      const { name, street, city, region, postalCode, country } =
+        addressData[0];
+      setreadableLocation(
+        `${name || street}, ${city}, ${region}, ${postalCode}, ${country}`
+      );
+    }
   }
+  console.log(readablelocation);
 
   function pickOnMapHandler() {
     // Implement this function to pick a location on the map
