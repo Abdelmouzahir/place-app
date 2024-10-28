@@ -3,7 +3,7 @@ import OutlinedButton from "../../UI/OutlinedButton";
 import { Colors } from "../../constants/colors";
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
-import MapView from "react-native-maps"; // Import MapView directly here
+import MapView from "react-native-maps";
 import {
   useNavigation,
   useRoute,
@@ -14,7 +14,7 @@ export default function LocationPicker({ onPickLocation }) {
   const [pickedLocation, setPickedLocation] = useState(null);
   const [locationPermission, requestPermission] =
     Location.useForegroundPermissions();
-  const [readablelocation, setreadableLocation] = useState(null);
+  const [readablelocation, setReadableLocation] = useState(null);
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
@@ -30,10 +30,15 @@ export default function LocationPicker({ onPickLocation }) {
   }, [route, isFocused]);
 
   useEffect(() => {
-    onPickLocation({ ...pickedLocation, address: readablelocation });
-  }, [pickedLocation, onPickLocation, readablelocation]);
+    if (pickedLocation) {
+      onPickLocation({ ...pickedLocation, address: readablelocation });
+    }
+  }, [pickedLocation, readablelocation, onPickLocation]);
 
   async function verifyPermission() {
+    if (!locationPermission) {
+      return false;
+    }
     if (locationPermission.status === Location.PermissionStatus.UNDETERMINED) {
       const permissionResponse = await requestPermission();
       return permissionResponse.granted;
@@ -56,34 +61,33 @@ export default function LocationPicker({ onPickLocation }) {
       return;
     }
     const location = await Location.getCurrentPositionAsync();
-    setPickedLocation({
+    const locationData = {
       lat: location.coords.latitude,
       lng: location.coords.longitude,
-    });
-    console.log(location);
-    console.log(pickedLocation);
-    // Reverse Geocode to get human-readable address
-    const addressData = await Location.reverseGeocodeAsync({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
-    // Extract address from the first result (if available)
-    if (addressData.length > 0) {
-      const { name, street, city, region, postalCode, country } =
-        addressData[0];
-      setreadableLocation(
-        `${name || street}, ${city}, ${region}, ${postalCode}, ${country}`
-      );
+    };
+    setPickedLocation(locationData);
+
+    try {
+      const addressData = await Location.reverseGeocodeAsync({
+        latitude: locationData.lat,
+        longitude: locationData.lng,
+      });
+      if (addressData.length > 0) {
+        const { name, street, city, region, postalCode, country } =
+          addressData[0];
+        setReadableLocation(
+          `${name || street}, ${city}, ${region}, ${postalCode}, ${country}`
+        );
+      }
+    } catch (error) {
+      console.log("Error fetching address: ", error);
     }
   }
-  console.log(readablelocation);
 
   function pickOnMapHandler() {
-    // Implement this function to pick a location on the map
     navigation.navigate("Map");
   }
 
-  // Conditionally render MapView or a placeholder text
   let locationPreview = <Text>No location picked yet.</Text>;
 
   if (pickedLocation) {
