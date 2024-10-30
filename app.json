@@ -18,7 +18,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.placeapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -29,7 +33,6 @@
         {
           "cameraPermission": "The app need acces to your camera in order to take photos to your favorite places."
         }
-        
       ]
     ]
   }

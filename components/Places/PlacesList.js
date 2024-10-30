@@ -13,6 +13,7 @@ export default function PlacesList({ places }) {
       </View>
     );
   }
+  console.log(places);
 
   return (
     <FlatList
