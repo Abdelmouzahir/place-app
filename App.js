@@ -8,7 +8,7 @@ import IconButton from "./UI/IconButton";
 import { Colors } from "./constants/colors";
 import Map from "./screens/Map";
 import { useEffect, useState } from "react";
-import * as SplashScreen from "expo-splash-screen"; // Import SplashScreen
+import * as SplashScreen from "expo-splash-screen";
 import init from "./util/database";
 
 const Stack = createNativeStackNavigator();
