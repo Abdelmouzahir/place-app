@@ -93,9 +93,9 @@ export function fetchPlaceDetails(id) {
             dbPlace.title,
             dbPlace.imageUri,
             {
-              address: dbPlace.address,
               lat: dbPlace.lat,
               lng: dbPlace.lng,
+              address: dbPlace.address,
             },
             dbPlace.id
           );
